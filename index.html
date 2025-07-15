@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Calculator</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f3f3f3;
+    font-family: Arial, sans-serif;
+  }
+
+  .calculator {
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #0008;
+    width: 300px;
+  }
+
+  .display {
+    background: #000;
+    color: #0f0;
+    font-size: 2rem;
+    padding: 10px;
+    text-align: right;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    min-height: 50px;
+    user-select: none;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+
+  button {
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #444;
+    color: white;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background: #666;
+  }
+
+  button.operator {
+    background: #ff9500;
+    color: white;
+  }
+
+  button.operator:hover {
+    background: #ffa733;
+  }
+
+  button.equal {
+    background: #00b300;
+    color: white;
+    grid-column: span 2;
+  }
+
+  button.equal:hover {
+    background: #33cc33;
+  }
+
+  button.clear {
+    background: #cc0000;
+    color: white;
+  }
+
+  button.clear:hover {
+    background: #ff3333;
+  }
+</style>
+</head>
+<body>
+
+<div class="calculator">
+  <div id="display" class="display">0</div>
+  <div class="buttons">
+    <button class="clear" id="clear">C</button>
+    <button class="operator" data-op="/">÷</button>
+    <button class="operator" data-op="*">×</button>
+    <button class="operator" data-op="-">−</button>
+
+    <button data-num="7">7</button>
+    <button data-num="8">8</button>
+    <button data-num="9">9</button>
+    <button class="operator" data-op="+">+</button>
+
+    <button data-num="4">4</button>
+    <button data-num="5">5</button>
+    <button data-num="6">6</button>
+    <button equal id="equals">=</button>
+
+    <button data-num="1">1</button>
+    <button data-num="2">2</button>
+    <button data-num="3">3</button>
+
+    <button data-num="0" style="grid-column: span 2;">0</button>
+    <button data-num=".">.</button>
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById('display');
+  const buttons = document.querySelectorAll('button');
+  let currentInput = '0';
+  let lastInput = '';
+  let operatorPressed = false;
+
+  function updateDisplay() {
+    display.textContent = currentInput;
+  }
+
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const num = button.getAttribute('data-num');
+      const op = button.getAttribute('data-op');
+
+      if (button.id === 'clear') {
+        currentInput = '0';
+        operatorPressed = false;
+        updateDisplay();
+        return;
+      }
+
+      if (button.id === 'equals') {
+        try {
+          // Evaluate expression safely
+          let result = eval(currentInput);
+          if (result === Infinity || result === -Infinity) {
+            result = "Error";
+          }
+          currentInput = result.toString();
+        } catch (e) {
+          currentInput = 'Error';
+        }
+        operatorPressed = false;
+        updateDisplay();
+        return;
+      }
+
+      if (num !== null) {
+        // Number or decimal point input
+        if (currentInput === '0' && num !== '.') {
+          currentInput = num;
+        } else if (num === '.' && currentInput.includes('.')) {
+          // Do nothing to prevent multiple decimals
+          return;
+        } else {
+          currentInput += num;
+        }
+        operatorPressed = false;
+        updateDisplay();
+        return;
+      }
+
+      if (op !== null) {
+        // Operator input
+        if (operatorPressed) {
+          // Replace last operator with new one
+          currentInput = currentInput.slice(0, -1) + op;
+        } else {
+          currentInput += op;
+          operatorPressed = true;
+        }
+        updateDisplay();
+      }
+    });
+  });
+
+  updateDisplay();
+</script>
+
+</body>
+</html>
